@@ -1,9 +1,8 @@
 <?php
 
 namespace Database\Factories;
-use App\Models\User;
-
 use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\User;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Post>
@@ -18,10 +17,9 @@ class PostFactory extends Factory
     public function definition(): array
     {
         return [
-             //
             'user_id' =>1,
-            'title' =>fake()->realText(),
-            'content' =>fake()->realText()                     
+            'title' =>fake()->realText(20, 5),
+            'content' =>fake()->realText(200, 5)                     
         ];
     }
 }
