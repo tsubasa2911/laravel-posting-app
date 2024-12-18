@@ -12,7 +12,7 @@ class PostController extends Controller
     // 一覧ページ
     public function index()
     {
-        $posts = Auth::user()->posts()->orderBy('created_at', 'desc')->get();
+        $posts = Auth::user()->posts()->orderBy('updated_at', 'Asc')->get();
 
         return view('posts.index', compact('posts'));
 
@@ -32,6 +32,12 @@ class PostController extends Controller
     // 作成機能
     public function store(PostRequest $request)
     {
+        // バリデーションを設定する
+        $request->validate([
+            'title' => 'required|integer|mix:40',
+            'content' => 'required|max:200'
+        ]);
+
         $post = new Post();
         $post->title = $request->input('title');
         $post->content = $request->input('content');
@@ -45,7 +51,7 @@ class PostController extends Controller
     public function edit(Post $post)
     {
             if ($post->user_id !== Auth::id()) {
-                return redirect()->route('post.index')->with('error_message', '不正なアクセスです。');
+                return redirect()->route('posts.index')->with('error_message', '不正なアクセスです。');
             }
             return view('posts.edit', compact('post'));
     }
@@ -56,12 +62,26 @@ class PostController extends Controller
         if ($post->user_id !==Auth::id()) {
             return redirect()->route('posts.index')->with('error_message', '不正なアクセスです。');
         }
-
+        // バリデーションを設定する
+        $request->validate([
+            'title' => 'required|integer|mix:40',
+            'content' => 'required|max:200'
+        ]);
+        
         $post->title = $request->input('title');
         $post->content = $request->input('content');
         $post->save();
 
         return redirect()->route('posts.show', $post)->with('flash_message', '投稿を編集しました。');
     }
-    
+    // 削除機能
+    public function destroy(Post $post) {
+        if ($post->user_id !== Auth::id()) {
+            return redirect()->route('posts.index')->with('error_message', '不正なアクセスです。');
+        }
+
+        $post->delete();
+
+        return redirect()->route('posts.index')->with('flash_message', '投稿を削除しました。');
+    }
 }
